@@ -4,14 +4,28 @@ source = {
    url = "git://github.com/Nepta/tqdm-lua",
    tag = "v1.0"
 }
+
 description = {
    homepage = "https://github.com/Nepta/tqdm-lua",
-   license = "MIT"
+   license = "MIT",
+   detailed = [[
+      (unofficial) tqdm-like lua pretty progress bar
+   ]]
 }
+
 build = {
-   type = "cmake",
+   type = "make",
+   modules = {
+      tqdm = "tqdm.cpp"
+   },
    variables = {
-      LIBDIR="$(LIBDIR)",
-      CMAKE_BUILD_TYPE="Release"
+      CC = "$(CC)",
+      CFLAGS = "$(CFLAGS)",
+      LIBFLAG = "$(LIBFLAG)",
+      LUA_INCDIR = "$(LUA_INCDIR)",
+      LIBDIR = "$(LIBDIR)"
+   },
+   install = {
+      lib = { ["tqdm"] = "tqdm.so" }
    }
 }
