@@ -144,10 +144,11 @@ public:
     period_ = 1 + totalTick_ / 200;
   }
 
-  void theme(std::string themeName) {
+  tqdm* theme(std::string themeName) {
     if (theme_.count(themeName) != 0) {
       bars_ = theme_[themeName];
     }
+    return this;
   }
 
   void progress(unsigned currentTick) {
