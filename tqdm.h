@@ -25,7 +25,7 @@ namespace lib {
 	using namespace std::chrono;
 
 	class tqdm {
-		time_point<system_clock> previousTickTime_ = system_clock::now();
+		time_point<high_resolution_clock> previousTickTime_ = high_resolution_clock::now();
 		duration<double> totalTime_;
 		unsigned previousTickValue_ = 0;
 		std::deque<double> deltaTimeList_;
@@ -144,7 +144,7 @@ namespace lib {
 			}
 
 			if (currentTick % period_ == 0) {
-				auto now = system_clock::now();
+				auto now = high_resolution_clock::now();
 				auto dtime = now - previousTickTime_;
 				auto dtick = currentTick - previousTickValue_;
 				previousTickTime_ = now;
