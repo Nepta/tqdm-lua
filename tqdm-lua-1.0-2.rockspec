@@ -1,8 +1,8 @@
 package = "tqdm-lua"
-version = "1.0-1"
+version = "1.0-2"
 source = {
    url = "git://github.com/Nepta/tqdm-lua",
-   tag = "v1.0"
+   tag = "v1.0-2"
 }
 
 description = {
