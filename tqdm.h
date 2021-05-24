@@ -49,6 +49,7 @@ class tqdm {
   };
 
   bool hasFinished_ = false;
+  bool hasColor_ = true;
 
 private:
   std::string update(unsigned int currentTick) {
@@ -62,9 +63,15 @@ private:
     double percent = 100.0 * currentTick / totalTick_;
 
     std::stringstream oss;
-    oss << clean() << formatBar(percent) << ansi::red << ' '
-        << formatPercent(percent) << ' '
-        << formatInfo(currentTick, averageRate, eta) << ansi::reset;
+    if (hasColor_) {
+      oss << clean() << formatBar(percent) << ansi::red << ' '
+          << formatPercent(percent) << ' '
+          << formatInfo(currentTick, averageRate, eta) << ansi::reset;
+    } else {
+      oss << clean() << formatBar(percent) << ' '
+          << formatPercent(percent) << ' '
+          << formatInfo(currentTick, averageRate, eta);
+    }
     return oss.str();
   }
 
@@ -76,9 +83,14 @@ private:
   std::string formatInfo(int currentTick, double averageRate,
                          double eta) const {
     std::stringstream oss;
-    oss << ansi::yellow << "[" << ansi::blue << currentTick << ansi::yellow
-        << "/" << ansi::blue << totalTick_ << ansi::yellow << " | "
-        << ansi::blue << std::fixed << std::setprecision(0) << std::setw(3);
+    if (hasColor_) {
+      oss << ansi::yellow << "[" << ansi::blue << currentTick << ansi::yellow
+          << "/" << ansi::blue << totalTick_ << ansi::yellow << " | "
+          << ansi::blue << std::fixed << std::setprecision(0) << std::setw(3);
+    } else {
+      oss << "[" << currentTick << "/" << totalTick_ << " | " << std::fixed
+          << std::setprecision(0) << std::setw(3);
+    }
     if (averageRate > 1e6) {
       oss << averageRate / 1e6 << " MHz";
     } else if (averageRate > 1e3) {
@@ -88,9 +100,15 @@ private:
     }
 
     auto totalTime = duration_cast<seconds>(totalTime_).count();
-    oss << ansi::yellow << " | " << ansi::blue << totalTime << "s"
-        << ansi::yellow << " : " << ansi::blue << eta << "s" << ansi::yellow
-        << "]";
+    if (hasColor_) {
+      oss << ansi::yellow << " | " << ansi::blue << totalTime << "s"
+          << ansi::yellow << " : " << ansi::blue << eta << "s" << ansi::yellow
+          << "]";
+    } else {
+      oss << " | " << totalTime << "s"
+          << " : " << eta << "s"
+          << "]";
+    }
     return oss.str();
   }
 
@@ -104,24 +122,37 @@ private:
     auto g = std::get<1>(rgb);
     auto b = std::get<2>(rgb);
 
-    oss << ansi::blue << "[" << ansi::rgb(r, g, b);
+    if (hasColor_) {
+      oss << ansi::blue << "[" << ansi::rgb(r, g, b);
+    } else {
+      oss << "[";
+    }
     for (unsigned i = 0; i < ifills; i++) {
       oss << bars_[8];
     }
     if (ifills < width_) {
-      oss << bars_[static_cast<unsigned>(8.0 * (fills - ifills))];
+      oss << bars_[8 * (fills - ifills)];
     }
     for (unsigned i = ifills + 1; i < width_; i++) {
       oss << bars_[0];
     }
-    oss << ansi::blue << "]";
+    if (hasColor_) {
+      oss << ansi::blue << "]";
+    } else {
+      oss << "]";
+    }
     return oss.str();
   }
 
   std::string formatPercent(double percent) const {
     std::stringstream oss;
-    oss << std::fixed << std::setprecision(percent == 100.0 ? 0 : 1)
-        << ansi::red << std::setw(4) << percent << "%";
+    if (hasColor_) {
+      oss << std::fixed << std::setprecision(percent == 100.0 ? 0 : 1)
+          << ansi::red << std::setw(4) << percent << "%";
+    } else {
+      oss << std::fixed << std::setprecision(percent == 100.0 ? 0 : 1)
+          << std::setw(4) << percent << "%";
+    }
     return oss.str();
   }
 
@@ -133,8 +164,13 @@ private:
     double averageTick =
         std::accumulate(deltaTickList_.begin(), deltaTickList_.end(), 0.);
     double averageRate = averageTick / averageMicroTime * 1e6;
-    oss << clean() << formatBar(100) << ansi::red << ' ' << formatPercent(100)
-        << ' ' << formatInfo(totalTick_, averageRate, 0) << ansi::reset;
+    if (hasColor_) {
+      oss << clean() << formatBar(100) << ansi::red << ' ' << formatPercent(100)
+          << ' ' << formatInfo(totalTick_, averageRate, 0) << ansi::reset;
+    } else {
+      oss << clean() << formatBar(100) << ' ' << formatPercent(100) << ' '
+          << formatInfo(totalTick_, averageRate, 0);
+    }
     return oss.str();
   }
 
@@ -144,9 +180,10 @@ public:
     period_ = 1 + totalTick_ / 200;
   }
 
-  tqdm* theme(std::string themeName) {
+  tqdm *theme(std::string themeName) {
     if (theme_.count(themeName) != 0) {
       bars_ = theme_[themeName];
+      hasColor_ = themeName != "basic";
     }
     return this;
   }
