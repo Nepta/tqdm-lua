@@ -8,6 +8,8 @@
 #include <numeric>
 #include <string>
 #include <unordered_map>
+#include <cmath>
+#include <algorithm>
 
 namespace lib {
 namespace ansi {
@@ -80,8 +82,15 @@ private:
     return '\r' + std::string(100, ' ') + '\r';
   }
 
-  std::string formatInfo(int currentTick, double averageRate,
-                         double eta) const {
+  std::string getSignificantDigit(const double number, const unsigned size) const {
+    const auto integralSize = std::ceil(std::max(std::log10(number), 1.0));
+    std::stringstream oss;
+    oss << std::fixed << std::setprecision(size - integralSize) << number;
+    return oss.str();
+  }
+
+  std::string formatInfo(const int currentTick, const double averageRate,
+                         const double eta) const {
     std::stringstream oss;
     if (hasColor_) {
       oss << ansi::yellow << "[" << ansi::blue << currentTick << ansi::yellow
@@ -92,11 +101,11 @@ private:
           << std::setprecision(0) << std::setw(3);
     }
     if (averageRate > 1e6) {
-      oss << averageRate / 1e6 << " MHz";
+      oss << getSignificantDigit(averageRate / 1e6,4) << " MHz";
     } else if (averageRate > 1e3) {
-      oss << averageRate / 1e3 << " kHz";
+      oss << getSignificantDigit(averageRate / 1e3,4) << " kHz";
     } else {
-      oss << averageRate << " Hz";
+      oss << getSignificantDigit(averageRate,4) << " Hz";
     }
 
     auto totalTime = duration_cast<seconds>(totalTime_).count();
