@@ -48,6 +48,8 @@ class tqdm {
       {"basic", {" ", " ", " ", " ", " ", " ", " ", " ", "#"}},
   };
 
+  bool hasFinished_ = false;
+
 private:
   std::string update(unsigned int currentTick) {
     double averageMicroTime =
@@ -149,26 +151,28 @@ public:
   }
 
   void progress(unsigned currentTick) {
-    if (currentTick >= totalTick_) {
+    if (currentTick >= totalTick_ and not hasFinished_) {
       std::cerr << finish() << std::endl;
-    }
+      hasFinished_ = true;
+    } else if (currentTick < totalTick_) {
+      hasFinished_ = false;
+      if (currentTick % period_ == 0) {
+        auto now = high_resolution_clock::now();
+        auto dtime = now - previousTickTime_;
+        auto dtick = currentTick - previousTickValue_;
+        previousTickTime_ = now;
+        previousTickValue_ = currentTick;
+        totalTime_ += dtime;
 
-    if (currentTick % period_ == 0) {
-      auto now = high_resolution_clock::now();
-      auto dtime = now - previousTickTime_;
-      auto dtick = currentTick - previousTickValue_;
-      previousTickTime_ = now;
-      previousTickValue_ = currentTick;
-      totalTime_ += dtime;
-
-      auto dtAsMicro = duration_cast<microseconds>(dtime).count();
-      deltaTimeList_.push_back(dtAsMicro);
-      deltaTickList_.push_back(dtick);
-      if (deltaTimeList_.size() > SMOOTHING_SIZE)
-        deltaTimeList_.pop_front();
-      if (deltaTickList_.size() > SMOOTHING_SIZE)
-        deltaTickList_.pop_front();
-      std::cerr << update(currentTick);
+        auto dtAsMicro = duration_cast<microseconds>(dtime).count();
+        deltaTimeList_.push_back(dtAsMicro);
+        deltaTickList_.push_back(dtick);
+        if (deltaTimeList_.size() > SMOOTHING_SIZE)
+          deltaTimeList_.pop_front();
+        if (deltaTickList_.size() > SMOOTHING_SIZE)
+          deltaTickList_.pop_front();
+        std::cerr << update(currentTick);
+      }
     }
   }
 };
