@@ -89,7 +89,10 @@ namespace lib {
 			double fills = percent * width_ / 100;
 			unsigned ifills = static_cast<unsigned>(fills);
 			unsigned hue_idx = hue::pct_to_idx(percent);
-			auto[r, g, b] = hue::hue_to_rgb(hue_idx);
+			auto rgb = hue::hue_to_rgb(hue_idx);
+                        auto r = std::get<0>(rgb);
+                        auto g = std::get<1>(rgb);
+                        auto b = std::get<2>(rgb);
 
 			oss << ansi::blue << "[" << ansi::rgb(r, g, b);
 			for (unsigned i = 0; i < ifills; i++) {

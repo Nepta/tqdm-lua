@@ -9,7 +9,7 @@ namespace hue {
 	}
 
 	constexpr auto hue_to_rgb(int hue) {
-		const std::array<std::tuple<int, int, int>, N> rgb = {
+		constexpr std::array<std::tuple<int, int, int>, N> rgb = {
           std::make_tuple(230, 115, 143),
           {230, 115, 143},
           {230, 115, 142},
