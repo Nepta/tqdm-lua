@@ -1,8 +1,8 @@
 package = "tqdm-lua"
-version = "1.0-2"
+version = "1.1-1"
 source = {
    url = "git://github.com/Nepta/tqdm-lua",
-   tag = "v1.0-2"
+   tag = "v1.1-1"
 }
 
 description = {
@@ -10,6 +10,7 @@ description = {
    license = "MIT",
    detailed = [[
       (unofficial) tqdm-like lua pretty progress bar
+      with iterator function to automatically display progress bar in for loop
    ]]
 }
 
