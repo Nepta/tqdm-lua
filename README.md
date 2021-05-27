@@ -1,6 +1,24 @@
 # tqdm-lua
  (unofficial) tqdm-like lua pretty progress bar
 
+#### iteator function
+```lua
+local tqdm = require "tqdm"
+
+local sumPairs = 0
+for i in tqdm.ipairs({1,2,3,4,5}) do
+   sumPairs = sumPairs + i 
+end
+
+local sumRange = 0
+for i in tqdm.range(5,1,-1) do
+   sumRange = sumRange + i
+end
+assert(sumPairs == sumRange)
+
+```
+
+#### use progress method directly
 ```lua
 local tqdm = require "tqdm"
 
